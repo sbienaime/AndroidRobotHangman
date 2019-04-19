@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        google()
+
+    }
+}
+apply plugin: 'com.android.application'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        applicationId "com.github.darthjoey91.hangman"
+        minSdkVersion 15
+        targetSdkVersion 27
+        versionCode 4
+        versionName "0.3.1-alpha"
+    }
+    allprojects {
+        repositories {
+            jcenter()
+            google()
+        }
+    }
+    buildTypes {
+        release {
+             false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.andreabaccega:android-form-edittext:1.1.0@aar'
+}
