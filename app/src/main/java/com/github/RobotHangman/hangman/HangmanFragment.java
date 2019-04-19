@@ -2,7 +2,6 @@ package com.github.RobotHangman.hangman;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,35 +12,35 @@ import android.widget.TextView;
 
 import com.andreabaccega.widget.FormEditText;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
 public class HangmanFragment extends Fragment {
-    //Declaring variables
+
+
+    private String word;
     public ArrayList<String> mWordList;
-    private ImageView mGallows;
-    private TextView mWrongGuesses;
-    private FormEditText mInput;
-    private String mWord;
-    private char mGuess;
-    private TextView mTheWord;    //May or may not be the bird.
-    private String mWrongGuessesData;
-    private String mTheWordDashes;
+    private ImageView imageView;
+    private TextView WrongGuesses;
+    private FormEditText input;
+    private char guess;
+    private TextView Word;
+    private String WrongGuessesInfo;
+    private String WordDashes;
     private int error;
-    private String LOG_TAG = "HangmanFragment";
-    private Scanner listScanner;
+    private String TAG = "HangmanFragment";
+    private Scanner scanner;
     private Button submit;
     private Button resetbtn;
     private void resetGame(){
-        mInput.requestFocus();
-        mGallows.setImageResource(R.drawable.error0);
-        mWrongGuessesData="";
-        mWrongGuesses.setText(mWrongGuessesData);
-        mWord = pickRandomWord(mWordList);
-        mTheWordDashes=hideWord(mWord);
-        mTheWord.setText(mTheWordDashes);
+        input.requestFocus();
+        imageView.setImageResource(R.drawable.error0);
+        WrongGuessesInfo ="";
+        WrongGuesses.setText(WrongGuessesInfo);
+        word = pickRandomWord(mWordList);
+        WordDashes =hideWord(word);
+        Word.setText(WordDashes);
         error=0;
 
         submit.setVisibility(View.VISIBLE);
@@ -55,53 +54,50 @@ public class HangmanFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View mainView = inflater.inflate(R.layout.fragment_main, container, false);
 
 
 
 
 
-        //Initialize game
-        fillWordList();
-        mGallows = (ImageView) rootView.findViewById(R.id.gallows);
-        mWrongGuesses = (TextView) rootView.findViewById(R.id.wrongletters);
-        mInput = (FormEditText) rootView.findViewById(R.id.input);
-        mTheWord = (TextView) rootView.findViewById(R.id.the_word);
-        submit = (Button) rootView.findViewById(R.id.submitbtn);
-        resetbtn = (Button) rootView.findViewById(R.id.resetbtn);
+        fillList();
+        imageView = (ImageView) mainView.findViewById(R.id.gallows);
+        WrongGuesses = (TextView) mainView.findViewById(R.id.wrongletters);
+        input = (FormEditText) mainView.findViewById(R.id.input);
+        Word = (TextView) mainView.findViewById(R.id.the_word);
+        submit = (Button) mainView.findViewById(R.id.submitbtn);
+        resetbtn = (Button) mainView.findViewById(R.id.resetbtn);
         resetGame();
 
 
-        //Main Flow of Game
 
-        //Listener listens for a click.
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Takes inputted letter.
-                mGuess=getLetter(mInput);
-                //Provided good input
-                if(mGuess!='\u0000') {
-                    //Find every instance of letter
-                    String temp = mTheWordDashes;
-                    mTheWordDashes = findCharInWord(mWord, mGuess, mTheWordDashes);
-                    //If letter is not in word
-                    if (mTheWordDashes.equals(temp)) {
-                        //Add letter to list of wrong letters appropriately
-                        if (mWrongGuessesData.equals("")) {
-                            mWrongGuessesData = mWrongGuessesData + String.valueOf(mGuess);
+
+                guess =getLetter(input);
+
+                if(guess !='\u0000') {
+
+                    String temp = WordDashes;
+                    WordDashes = findCharInWord(word, guess, WordDashes);
+
+                    if (WordDashes.equals(temp)) {
+
+                        if (WrongGuessesInfo.equals("")) {
+                            WrongGuessesInfo = WrongGuessesInfo + String.valueOf(guess);
                         } else {
-                            mWrongGuessesData = mWrongGuessesData + ", " + String.valueOf(mGuess);
+                            WrongGuessesInfo = WrongGuessesInfo + ", " + String.valueOf(guess);
                         }
-                        mWrongGuesses.setText(mWrongGuessesData);
-                        //Then add new stuff to hangman
+                        WrongGuesses.setText(WrongGuessesInfo);
+
                         increaseError();
                     } else {
-                        //Reset the input and show that the letter was right.
-                        mTheWord.setText(mTheWordDashes);
-                        mInput.setText("");
+
+                        Word.setText(WordDashes);
+                        input.setText("");
                     }
-                    mInput.requestFocus();
+                    input.requestFocus();
                     endGame();
                 }
             }
@@ -120,7 +116,7 @@ public class HangmanFragment extends Fragment {
 
 
 
-        return rootView;
+        return mainView;
     }
 
     public char getLetter(FormEditText input)
@@ -178,30 +174,30 @@ public class HangmanFragment extends Fragment {
         error+=1;
         if(error<6){
             String id = "error"+String.valueOf(error);
-            mGallows.setImageResource(getResources().getIdentifier(id,"drawable","com.github.darthjoey91.hangman"));
-            mInput.setText("");
-            mTheWord.setText(mTheWordDashes);
+            imageView.setImageResource(getResources().getIdentifier(id,"drawable","com.github.darthjoey91.hangman"));
+            input.setText("");
+            Word.setText(WordDashes);
         }
     }
 
     public void endGame(){
-        if(mWord.equals(mTheWordDashes))
+        if(word.equals(WordDashes))
         {
-            mWrongGuesses.setText(R.string.game_over);
-            mTheWord.setText(R.string.game_win);
-            mGallows.setImageResource(R.drawable.win);
+            WrongGuesses.setText(R.string.game_over);
+            Word.setText(R.string.game_win);
+            imageView.setImageResource(R.drawable.win);
             submit.setVisibility(View.GONE);
             resetbtn.setVisibility(View.VISIBLE);
         }else if (error>=6){
-            mTheWord.setText(mWord);
-            mWrongGuesses.setText(R.string.game_over);
-            mGallows.setImageResource(R.drawable.error6);
+            Word.setText(word);
+            WrongGuesses.setText(R.string.game_over);
+            imageView.setImageResource(R.drawable.error6);
             submit.setVisibility(View.GONE);
             resetbtn.setVisibility(View.VISIBLE);
         }
     }
 
-    public void fillWordList(){
+    public void fillList(){
 
         mWordList = new ArrayList<String>();
 
@@ -217,17 +213,17 @@ public class HangmanFragment extends Fragment {
 
 
     public void useDefaultWordlist(){
-        listScanner = new Scanner(getResources().openRawResource(R.raw.wordlist));
+        scanner = new Scanner(getResources().openRawResource(R.raw.wordlist));
 
 
         try {
-            while (listScanner.hasNext()) {
-                mWordList.add(listScanner.next());
+            while (scanner.hasNext()) {
+                mWordList.add(scanner.next());
             }
         } catch (Exception e){
-            Log.e(LOG_TAG, e.getMessage());
+            Log.e(TAG, e.getMessage());
         } finally {
-            listScanner.close();
+            scanner.close();
         }
     }
 
